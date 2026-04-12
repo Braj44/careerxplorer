@@ -1,0 +1,1994 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CareerXplorer — Find Your Stream</title>
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;600;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg: #0a0a14;
+  --surface: #111122;
+  --card: #16162a;
+  --border: rgba(255,255,255,0.08);
+  --border2: rgba(255,255,255,0.14);
+  --gold: #f7c948;
+  --gold2: #e8a020;
+  --blue: #4f8ef7;
+  --teal: #2dd4bf;
+  --purple: #a78bfa;
+  --pink: #f472b6;
+  --green: #34d399;
+  --text: #f0f0ff;
+  --muted: #8888aa;
+  --dim: #444466;
+  --radius: 14px;
+  --radius-sm: 8px;
+  --radius-lg: 20px;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ──────────── UTILITY ──────────── */
+.hidden { display: none !important; }
+.page { display: none; min-height: 100vh; }
+.page.active { display: block; }
+
+/* ──────────── BACKGROUND MESH ──────────── */
+.bg-mesh {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  overflow: hidden;
+}
+.bg-mesh::before {
+  content: '';
+  position: absolute;
+  width: 600px; height: 600px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(79,142,247,0.07) 0%, transparent 70%);
+  top: -200px; left: -200px;
+  animation: drift1 20s ease-in-out infinite alternate;
+}
+.bg-mesh::after {
+  content: '';
+  position: absolute;
+  width: 500px; height: 500px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(247,201,72,0.06) 0%, transparent 70%);
+  bottom: -100px; right: -100px;
+  animation: drift2 18s ease-in-out infinite alternate;
+}
+@keyframes drift1 { to { transform: translate(80px, 60px); } }
+@keyframes drift2 { to { transform: translate(-60px, -80px); } }
+
+.content-wrap { position: relative; z-index: 1; }
+
+/* ──────────── NAVBAR ──────────── */
+.navbar {
+  position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+  height: 64px;
+  background: rgba(10,10,20,0.85);
+  backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 32px;
+}
+
+.nav-logo {
+  font-family: 'Baloo 2', cursive;
+  font-size: 22px; font-weight: 800;
+  background: linear-gradient(90deg, var(--gold), var(--blue));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  cursor: pointer;
+}
+
+.nav-links { display: flex; gap: 8px; align-items: center; }
+
+.nav-link {
+  padding: 7px 16px;
+  border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 500;
+  color: var(--muted);
+  cursor: pointer;
+  border: none; background: none;
+  transition: all 0.2s;
+}
+.nav-link:hover { color: var(--text); background: rgba(255,255,255,0.05); }
+.nav-link.active-link { color: var(--gold); }
+
+.nav-btn {
+  padding: 8px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--gold);
+  background: transparent;
+  color: var(--gold);
+  transition: all 0.2s;
+}
+.nav-btn:hover { background: var(--gold); color: #0a0a14; }
+.nav-btn.filled { background: var(--gold); color: #0a0a14; border-color: var(--gold); }
+.nav-btn.filled:hover { background: var(--gold2); }
+
+/* ──────────── LANDING ──────────── */
+.hero {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 100px 24px 60px;
+  text-align: center;
+}
+
+.hero-eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: rgba(247,201,72,0.1);
+  border: 1px solid rgba(247,201,72,0.25);
+  border-radius: 50px;
+  padding: 6px 16px;
+  font-size: 13px; font-weight: 600; color: var(--gold);
+  margin-bottom: 28px;
+  animation: fadeUp 0.6s ease both;
+}
+
+.hero-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(38px, 7vw, 76px);
+  font-weight: 800;
+  line-height: 1.08;
+  margin-bottom: 20px;
+  animation: fadeUp 0.6s 0.1s ease both;
+}
+
+.hero-title .accent-gold { color: var(--gold); }
+.hero-title .accent-blue {
+  background: linear-gradient(90deg, var(--blue), var(--teal));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+}
+
+.hero-sub {
+  font-size: 18px; color: var(--muted);
+  max-width: 560px; line-height: 1.7;
+  margin-bottom: 40px;
+  animation: fadeUp 0.6s 0.2s ease both;
+}
+
+.hero-actions {
+  display: flex; gap: 12px; flex-wrap: wrap; justify-content: center;
+  margin-bottom: 64px;
+  animation: fadeUp 0.6s 0.3s ease both;
+}
+
+.btn-hero {
+  padding: 14px 32px;
+  border-radius: var(--radius);
+  font-size: 16px; font-weight: 700;
+  cursor: pointer; border: none;
+  transition: all 0.2s;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.btn-hero.primary {
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: #0a0a14;
+}
+.btn-hero.primary:hover { transform: translateY(-2px); box-shadow: 0 8px 30px rgba(247,201,72,0.3); }
+
+.btn-hero.secondary {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid var(--border2);
+  color: var(--text);
+}
+.btn-hero.secondary:hover { background: rgba(255,255,255,0.1); transform: translateY(-2px); }
+
+.stats-row {
+  display: flex; gap: 40px; flex-wrap: wrap; justify-content: center;
+  animation: fadeUp 0.6s 0.4s ease both;
+}
+
+.stat-item { text-align: center; }
+.stat-num {
+  font-family: 'Baloo 2', cursive;
+  font-size: 32px; font-weight: 800; color: var(--gold);
+}
+.stat-label { font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+/* Features section */
+.features {
+  padding: 80px 24px;
+  max-width: 1100px; margin: 0 auto;
+}
+
+.section-label {
+  text-align: center;
+  font-size: 13px; font-weight: 600;
+  color: var(--blue); letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 14px;
+}
+
+.section-title {
+  text-align: center;
+  font-family: 'Baloo 2', cursive;
+  font-size: clamp(26px, 4vw, 40px); font-weight: 700;
+  margin-bottom: 48px;
+}
+
+.features-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+.feature-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 28px;
+  transition: all 0.3s;
+}
+.feature-card:hover { border-color: var(--border2); transform: translateY(-4px); }
+
+.feat-icon {
+  width: 52px; height: 52px;
+  border-radius: var(--radius);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 24px; margin-bottom: 16px;
+}
+
+.feat-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; }
+.feat-desc { font-size: 14px; color: var(--muted); line-height: 1.65; }
+
+/* Streams section */
+.streams-section {
+  padding: 80px 24px;
+  background: var(--surface);
+}
+
+.streams-inner { max-width: 1100px; margin: 0 auto; }
+
+.stream-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 20px; margin-top: 48px;
+}
+
+.stream-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  cursor: pointer;
+  transition: all 0.3s;
+  position: relative; overflow: hidden;
+}
+.stream-card::before {
+  content: '';
+  position: absolute; top: 0; left: 0; right: 0; height: 3px;
+}
+.stream-card.sci::before { background: linear-gradient(90deg, var(--blue), var(--teal)); }
+.stream-card.com::before { background: linear-gradient(90deg, var(--gold), var(--gold2)); }
+.stream-card.art::before { background: linear-gradient(90deg, var(--purple), var(--pink)); }
+.stream-card:hover { transform: translateY(-6px); border-color: var(--border2); }
+
+.stream-emoji { font-size: 40px; margin-bottom: 16px; }
+.stream-name { font-family: 'Baloo 2', cursive; font-size: 22px; font-weight: 700; margin-bottom: 8px; }
+.stream-tagline { font-size: 14px; color: var(--muted); margin-bottom: 16px; line-height: 1.5; }
+
+.stream-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+.stag {
+  padding: 4px 10px; border-radius: 50px;
+  font-size: 12px; font-weight: 600;
+  border: 1px solid var(--border2); color: var(--muted);
+}
+
+/* CTA banner */
+.cta-section {
+  padding: 80px 24px;
+  text-align: center;
+}
+
+.cta-box {
+  max-width: 640px; margin: 0 auto;
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  padding: 52px 40px;
+}
+.cta-title { font-family: 'Baloo 2', cursive; font-size: 32px; font-weight: 800; margin-bottom: 12px; }
+.cta-sub { font-size: 16px; color: var(--muted); margin-bottom: 28px; line-height: 1.6; }
+
+/* ──────────── AUTH PAGE ──────────── */
+.auth-wrap {
+  min-height: 100vh;
+  display: flex; align-items: center; justify-content: center;
+  padding: 80px 24px 24px;
+}
+
+.auth-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 44px 40px;
+  width: 100%; max-width: 420px;
+}
+
+.auth-logo {
+  text-align: center;
+  font-family: 'Baloo 2', cursive;
+  font-size: 28px; font-weight: 800;
+  background: linear-gradient(90deg, var(--gold), var(--blue));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+}
+
+.auth-sub { text-align: center; color: var(--muted); font-size: 14px; margin-bottom: 36px; }
+
+.form-group { margin-bottom: 18px; }
+
+.form-label {
+  display: block;
+  font-size: 13px; font-weight: 600;
+  color: var(--muted); margin-bottom: 7px;
+  letter-spacing: 0.5px;
+}
+
+.form-input {
+  width: 100%;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 12px 16px;
+  color: var(--text);
+  font-size: 15px;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  transition: border-color 0.2s;
+  outline: none;
+}
+.form-input:focus { border-color: var(--gold); }
+.form-input::placeholder { color: var(--dim); }
+
+.form-btn {
+  width: 100%;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  color: #0a0a14;
+  border: none;
+  border-radius: var(--radius-sm);
+  padding: 13px;
+  font-size: 16px; font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  cursor: pointer;
+  margin-top: 8px;
+  transition: all 0.2s;
+}
+.form-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(247,201,72,0.25); }
+
+.auth-switch {
+  text-align: center;
+  margin-top: 20px;
+  font-size: 14px; color: var(--muted);
+}
+.auth-switch span { color: var(--gold); cursor: pointer; font-weight: 600; }
+.auth-switch span:hover { text-decoration: underline; }
+
+.auth-error {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.3);
+  border-radius: var(--radius-sm);
+  padding: 10px 14px;
+  font-size: 13px; color: #f87171;
+  margin-bottom: 16px;
+}
+
+.divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 20px 0;
+  color: var(--dim); font-size: 12px;
+}
+.divider::before, .divider::after {
+  content: ''; flex: 1;
+  height: 1px; background: var(--border);
+}
+
+/* ──────────── DASHBOARD ──────────── */
+.dash-layout {
+  display: flex; min-height: 100vh;
+}
+
+.sidebar {
+  width: 240px; flex-shrink: 0;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: 80px 0 24px;
+  position: fixed; top: 0; left: 0; bottom: 0;
+  overflow-y: auto;
+  z-index: 10;
+}
+
+.sidebar-section { padding: 8px 16px; margin-top: 8px; }
+.sidebar-label {
+  font-size: 11px; font-weight: 700;
+  color: var(--dim); letter-spacing: 1.5px;
+  text-transform: uppercase;
+  padding: 0 8px; margin-bottom: 6px;
+}
+
+.sidebar-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 12px;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 14px; font-weight: 500; color: var(--muted);
+  transition: all 0.15s;
+  border: none; background: none; width: 100%; text-align: left;
+}
+.sidebar-item:hover { background: rgba(255,255,255,0.05); color: var(--text); }
+.sidebar-item.active { background: rgba(247,201,72,0.1); color: var(--gold); }
+.sidebar-icon { font-size: 16px; }
+
+.dash-content {
+  margin-left: 240px;
+  flex: 1;
+  padding: 90px 32px 40px;
+}
+
+/* User greeting */
+.dash-greeting {
+  margin-bottom: 32px;
+}
+.greeting-hi { font-size: 14px; color: var(--muted); margin-bottom: 4px; }
+.greeting-name {
+  font-family: 'Baloo 2', cursive;
+  font-size: 30px; font-weight: 800;
+  margin-bottom: 6px;
+}
+.greeting-sub { font-size: 14px; color: var(--muted); }
+
+/* XP Level bar */
+.xp-level-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px 24px;
+  margin-bottom: 24px;
+  display: flex; align-items: center; gap: 20px;
+}
+
+.level-badge {
+  width: 56px; height: 56px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--gold2));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Baloo 2', cursive;
+  font-size: 18px; font-weight: 800; color: #0a0a14;
+  flex-shrink: 0;
+}
+
+.xp-info { flex: 1; }
+.xp-title { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.xp-subtitle { font-size: 12px; color: var(--muted); margin-bottom: 10px; }
+.xp-bar-bg {
+  background: rgba(255,255,255,0.08);
+  border-radius: 50px; height: 8px; overflow: hidden;
+}
+.xp-bar-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--blue));
+  border-radius: 50px;
+  transition: width 1s ease;
+}
+.xp-count { font-size: 13px; color: var(--gold); font-weight: 600; }
+
+/* Stats grid */
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.stat-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+}
+.stat-box-val {
+  font-family: 'Baloo 2', cursive;
+  font-size: 26px; font-weight: 800;
+  margin-bottom: 4px;
+}
+.stat-box-lbl { font-size: 12px; color: var(--muted); }
+
+/* Dash panels */
+.dash-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 28px;
+}
+
+@media (max-width: 900px) {
+  .dash-grid { grid-template-columns: 1fr; }
+  .sidebar { width: 200px; }
+  .dash-content { margin-left: 200px; }
+}
+
+.dash-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 24px;
+}
+
+.panel-title {
+  font-size: 15px; font-weight: 700;
+  margin-bottom: 18px;
+  display: flex; align-items: center; gap: 8px;
+}
+
+/* Quick action cards */
+.quick-actions {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; margin-bottom: 28px;
+}
+
+.qa-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 20px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+}
+.qa-card:hover { border-color: var(--border2); transform: translateY(-2px); }
+.qa-icon { font-size: 28px; margin-bottom: 8px; }
+.qa-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; }
+.qa-sub { font-size: 12px; color: var(--muted); }
+
+/* Stream result in dash */
+.stream-result-banner {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 28px;
+  border-left: 4px solid var(--gold);
+  display: flex; align-items: center; gap: 16px;
+}
+.sr-icon { font-size: 40px; }
+.sr-stream { font-family: 'Baloo 2', cursive; font-size: 20px; font-weight: 800; }
+.sr-sub { font-size: 13px; color: var(--muted); margin-top: 4px; }
+.sr-score {
+  margin-left: auto;
+  background: rgba(247,201,72,0.1);
+  border: 1px solid rgba(247,201,72,0.3);
+  border-radius: var(--radius-sm);
+  padding: 8px 16px;
+  text-align: center;
+}
+.sr-score-val { font-family: 'Baloo 2', cursive; font-size: 22px; font-weight: 800; color: var(--gold); }
+.sr-score-lbl { font-size: 11px; color: var(--muted); }
+
+/* ──────────── QUIZ PAGE ──────────── */
+.quiz-wrap {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  padding: 80px 24px 40px;
+}
+
+.quiz-container { width: 100%; max-width: 680px; }
+
+.quiz-header { margin-bottom: 24px; }
+
+.quiz-prog-label {
+  display: flex; justify-content: space-between;
+  font-size: 13px; color: var(--muted);
+  margin-bottom: 8px;
+}
+
+.prog-track {
+  background: rgba(255,255,255,0.08);
+  border-radius: 50px; height: 6px; overflow: hidden; margin-bottom: 16px;
+}
+.prog-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold), var(--blue));
+  border-radius: 50px;
+  transition: width 0.5s ease;
+}
+
+.quiz-meta {
+  display: flex; gap: 12px; flex-wrap: wrap;
+}
+
+.xp-chip {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(247,201,72,0.1);
+  border: 1px solid rgba(247,201,72,0.2);
+  border-radius: 50px;
+  padding: 5px 12px;
+  font-size: 13px; font-weight: 700; color: var(--gold);
+}
+
+.combo-chip {
+  display: flex; align-items: center; gap: 6px;
+  background: rgba(167,139,250,0.1);
+  border: 1px solid rgba(167,139,250,0.2);
+  border-radius: 50px;
+  padding: 5px 12px;
+  font-size: 13px; font-weight: 700; color: var(--purple);
+}
+
+.q-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 32px;
+  margin-bottom: 20px;
+}
+
+.q-cat {
+  font-size: 12px; font-weight: 700;
+  color: var(--gold); letter-spacing: 1.5px;
+  text-transform: uppercase; margin-bottom: 12px;
+}
+
+.q-text {
+  font-family: 'Baloo 2', cursive;
+  font-size: 22px; font-weight: 700; line-height: 1.35;
+}
+
+.options-list { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+.opt-btn {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 16px 14px;
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  font-size: 14px; font-weight: 500;
+  line-height: 1.45;
+  transition: all 0.2s;
+  display: flex; align-items: flex-start; gap: 10px;
+}
+.opt-btn:hover { border-color: var(--gold); background: rgba(247,201,72,0.06); }
+.opt-btn.selected { border-color: var(--gold); background: rgba(247,201,72,0.12); color: var(--gold); }
+.opt-ico { font-size: 20px; flex-shrink: 0; line-height: 1; }
+
+/* combo popup */
+.combo-popup {
+  background: rgba(167,139,250,0.15);
+  border: 1px solid rgba(167,139,250,0.3);
+  border-radius: var(--radius-sm);
+  padding: 10px 16px;
+  font-size: 14px; font-weight: 700; color: var(--purple);
+  text-align: center; margin-bottom: 12px;
+}
+
+.xp-float {
+  position: fixed;
+  font-family: 'Baloo 2', cursive;
+  font-size: 20px; font-weight: 800; color: var(--gold);
+  pointer-events: none; z-index: 999;
+  animation: floatUp 1s ease forwards;
+}
+
+@keyframes floatUp {
+  0% { opacity: 1; transform: translateY(0) scale(1); }
+  100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
+}
+
+/* ──────────── RESULTS PAGE ──────────── */
+.results-wrap {
+  min-height: 100vh;
+  display: flex; flex-direction: column;
+  align-items: center;
+  padding: 90px 24px 60px;
+}
+
+.results-container { width: 100%; max-width: 760px; }
+
+.result-hero {
+  text-align: center; margin-bottom: 36px;
+}
+
+.result-badge {
+  display: inline-block;
+  font-size: 64px; margin-bottom: 16px;
+  animation: popIn 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes popIn {
+  0% { transform: scale(0); opacity: 0; }
+  100% { transform: scale(1); opacity: 1; }
+}
+
+.result-stream-title {
+  font-family: 'Baloo 2', cursive;
+  font-size: 36px; font-weight: 800; margin-bottom: 10px;
+}
+
+.result-tagline { font-size: 16px; color: var(--muted); max-width: 500px; margin: 0 auto 28px; line-height: 1.6; }
+
+.score-chips {
+  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+  margin-bottom: 36px;
+}
+
+.score-chip {
+  background: var(--card);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 14px 20px; text-align: center;
+  min-width: 100px;
+}
+.sc-val { font-family: 'Baloo 2', cursive; font-size: 26px; font-weight: 800; }
+.sc-lbl { font-size: 11px; color: var(--muted); margin-top: 2px; letter-spacing: 0.5px; }
+
+.results-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 28px; }
+@media (max-width: 640px) { .results-grid { grid-template-columns: 1fr; } .options-list { grid-template-columns: 1fr; } }
+
+.result-panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+}
+
+.rp-title { font-size: 14px; font-weight: 700; color: var(--muted); letter-spacing: 0.5px; margin-bottom: 16px; }
+
+.stream-score-row {
+  display: flex; align-items: center; gap: 10px; margin-bottom: 12px;
+}
+.ssr-name { font-size: 13px; font-weight: 600; min-width: 100px; }
+.ssr-bar { flex: 1; background: rgba(255,255,255,0.06); border-radius: 50px; height: 8px; overflow: hidden; }
+.ssr-fill { height: 100%; border-radius: 50px; transition: width 1.2s ease; }
+.ssr-pct { font-size: 12px; font-weight: 700; min-width: 36px; text-align: right; }
+
+.opp-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.opp-pill {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 9px 12px;
+  font-size: 12px; font-weight: 600;
+  display: flex; align-items: center; gap: 7px;
+}
+.opp-dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+
+.result-cta-row {
+  display: flex; gap: 12px; justify-content: center; flex-wrap: wrap;
+}
+
+/* ──────────── EXPLORE PAGE ──────────── */
+.explore-wrap { padding: 90px 32px 60px; max-width: 1100px; margin: 0 auto; }
+
+.explore-header { margin-bottom: 36px; }
+.explore-title { font-family: 'Baloo 2', cursive; font-size: 32px; font-weight: 800; margin-bottom: 8px; }
+.explore-sub { font-size: 15px; color: var(--muted); }
+
+.tab-bar { display: flex; gap: 8px; margin-bottom: 28px; flex-wrap: wrap; }
+.tab-btn {
+  padding: 8px 20px;
+  border-radius: var(--radius-sm);
+  font-size: 14px; font-weight: 600;
+  cursor: pointer;
+  border: 1px solid var(--border);
+  background: transparent; color: var(--muted);
+  transition: all 0.2s;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.tab-btn:hover { border-color: var(--border2); color: var(--text); }
+.tab-btn.active { background: var(--gold); color: #0a0a14; border-color: var(--gold); }
+
+.tab-panel { display: none; }
+.tab-panel.active { display: block; }
+
+/* Career cards */
+.career-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+
+.career-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  transition: all 0.2s;
+}
+.career-card:hover { border-color: var(--border2); transform: translateY(-3px); }
+
+.cc-header { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.cc-icon { font-size: 28px; }
+.cc-title { font-size: 16px; font-weight: 700; }
+.cc-salary {
+  margin-left: auto;
+  font-size: 12px; font-weight: 700;
+  background: rgba(52,211,153,0.1); color: var(--green);
+  padding: 3px 9px; border-radius: 50px;
+}
+.cc-desc { font-size: 13px; color: var(--muted); line-height: 1.55; margin-bottom: 12px; }
+.cc-steps { display: flex; gap: 5px; flex-wrap: wrap; }
+.cc-step {
+  font-size: 11px; padding: 3px 9px;
+  background: rgba(255,255,255,0.05); color: var(--muted);
+  border-radius: var(--radius-sm);
+}
+
+/* College cards */
+.college-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
+
+.college-crd {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 22px;
+  transition: all 0.2s;
+}
+.college-crd:hover { border-color: var(--border2); }
+.coll-rank {
+  width: 36px; height: 36px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; font-weight: 700; margin-bottom: 12px;
+}
+.coll-name { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
+.coll-city { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.coll-tags { display: flex; flex-wrap: wrap; gap: 5px; }
+.coll-tag {
+  font-size: 11px; padding: 3px 9px;
+  border: 1px solid var(--border); color: var(--muted);
+  border-radius: 50px;
+}
+
+/* ──────────── PROFILE PAGE ──────────── */
+.profile-wrap { padding: 90px 32px 60px; max-width: 700px; margin: 0 auto; }
+.profile-card {
+  background: var(--card); border: 1px solid var(--border);
+  border-radius: var(--radius-lg); padding: 32px; margin-bottom: 20px;
+}
+.profile-avatar {
+  width: 80px; height: 80px; border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold), var(--blue));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Baloo 2', cursive; font-size: 28px; font-weight: 800; color: #0a0a14;
+  margin: 0 auto 16px;
+}
+.profile-name { text-align: center; font-family: 'Baloo 2', cursive; font-size: 24px; font-weight: 800; margin-bottom: 4px; }
+.profile-email { text-align: center; font-size: 14px; color: var(--muted); margin-bottom: 20px; }
+.profile-badges { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; }
+.pb {
+  padding: 5px 14px; border-radius: 50px; font-size: 12px; font-weight: 700;
+  background: rgba(247,201,72,0.1); color: var(--gold);
+  border: 1px solid rgba(247,201,72,0.2);
+}
+
+/* ──────────── ANIMATIONS ──────────── */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ──────────── MISC ──────────── */
+.badge-pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 12px; border-radius: 50px;
+  font-size: 12px; font-weight: 600;
+}
+
+.toast {
+  position: fixed; bottom: 28px; right: 28px; z-index: 999;
+  background: var(--card); border: 1px solid var(--border2);
+  border-radius: var(--radius);
+  padding: 14px 20px;
+  font-size: 14px; font-weight: 600;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+  animation: slideIn 0.3s ease;
+  max-width: 300px;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(100px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+.footer {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  padding: 40px 32px;
+  text-align: center;
+  color: var(--muted); font-size: 14px;
+}
+
+.footer-logo {
+  font-family: 'Baloo 2', cursive; font-size: 20px; font-weight: 800;
+  background: linear-gradient(90deg, var(--gold), var(--blue));
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text; margin-bottom: 8px;
+}
+
+select.form-input { appearance: none; cursor: pointer; }
+
+/* Nav stream filter */
+.stream-filter { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+.sf-btn {
+  padding: 6px 16px; border-radius: 50px;
+  font-size: 13px; font-weight: 600;
+  cursor: pointer; border: 1px solid var(--border); background: none; color: var(--muted);
+  transition: all 0.15s;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+.sf-btn:hover { border-color: var(--border2); color: var(--text); }
+.sf-btn.active { background: var(--gold); color: #0a0a14; border-color: var(--gold); }
+</style>
+</head>
+<body>
+
+<div class="bg-mesh"></div>
+
+<!-- ═══════════════ NAVBAR ═══════════════ -->
+<nav class="navbar content-wrap">
+  <div class="nav-logo" onclick="navigate('landing')">CareerXplorer</div>
+  <div class="nav-links" id="nav-links">
+    <button class="nav-link" onclick="navigate('landing')">Home</button>
+    <button class="nav-link" id="nav-explore" onclick="navigate('explore')">Explore</button>
+    <button class="nav-link" id="nav-quiz" onclick="requireAuth('quiz')">Take Quiz</button>
+    <div id="nav-auth-btns">
+      <button class="nav-btn" onclick="navigate('login')" style="margin-right:8px">Login</button>
+      <button class="nav-btn filled" onclick="navigate('register')">Sign Up</button>
+    </div>
+    <div id="nav-user-btns" class="hidden">
+      <button class="nav-link" onclick="navigate('dashboard')">Dashboard</button>
+      <button class="nav-btn" onclick="logout()">Logout</button>
+    </div>
+  </div>
+</nav>
+
+<!-- ═══════════════ LANDING PAGE ═══════════════ -->
+<div class="page active content-wrap" id="page-landing">
+  <div class="hero">
+    <div class="hero-eyebrow">🚀 Class 10th se 11th ka safar</div>
+    <h1 class="hero-title">
+      Apna <span class="accent-gold">Career</span> khud<br>
+      <span class="accent-blue">Discover</span> karo
+    </h1>
+    <p class="hero-sub">India ka pehla gamified career exploration platform — jo students ko unke interests ke through sahi stream choose karne mein help karta hai.</p>
+    <div class="hero-actions">
+      <button class="btn-hero primary" onclick="requireAuth('quiz')">🎮 Quiz Start Karo</button>
+      <button class="btn-hero secondary" onclick="navigate('explore')">🔍 Streams Explore Karo</button>
+    </div>
+    <div class="stats-row">
+      <div class="stat-item"><div class="stat-num">3</div><div class="stat-label">Streams covered</div></div>
+      <div class="stat-item"><div class="stat-num">50+</div><div class="stat-label">Career paths</div></div>
+      <div class="stat-item"><div class="stat-num">10</div><div class="stat-label">Smart questions</div></div>
+      <div class="stat-item"><div class="stat-num">100%</div><div class="stat-label">Free platform</div></div>
+    </div>
+  </div>
+
+  <section class="features">
+    <div class="section-label">How it works</div>
+    <h2 class="section-title">3 steps mein apna stream jaano</h2>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feat-icon" style="background:rgba(79,142,247,0.1)">🎯</div>
+        <div class="feat-title">Gamified Quiz</div>
+        <div class="feat-desc">10 carefully designed questions jo tumhare interests, personality aur thinking style ko deeply analyze karte hain. XP points aur combos ke saath maza bhi!</div>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon" style="background:rgba(247,201,72,0.1)">📊</div>
+        <div class="feat-title">Smart Analysis</div>
+        <div class="feat-desc">Tumhare answers ko Science, Commerce aur Arts mein score kiya jaata hai — phir ek detailed rating aur percentage breakdown diya jaata hai.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feat-icon" style="background:rgba(52,211,153,0.1)">🗺️</div>
+        <div class="feat-title">Career Roadmap</div>
+        <div class="feat-desc">Recommended stream ke saath top colleges, career options, expected salaries aur required skills sab ek jagah milte hain — personalized tumhare liye!</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="streams-section">
+    <div class="streams-inner">
+      <div class="section-label">Streams</div>
+      <h2 class="section-title">Kaunsi duniya tumhe bulati hai?</h2>
+      <div class="stream-cards">
+        <div class="stream-card sci" onclick="navigate('explore');setExploreStream('sci')">
+          <div class="stream-emoji">🔬</div>
+          <div class="stream-name">Science</div>
+          <div class="stream-tagline">Curious minds jo duniya ke rahasyein suljhana chahte hain — engineering, medical, research aur technology.</div>
+          <div class="stream-tags">
+            <span class="stag">Engineering</span>
+            <span class="stag">Medical</span>
+            <span class="stag">Research</span>
+            <span class="stag">IT/Tech</span>
+          </div>
+        </div>
+        <div class="stream-card com" onclick="navigate('explore');setExploreStream('com')">
+          <div class="stream-emoji">📈</div>
+          <div class="stream-name">Commerce</div>
+          <div class="stream-tagline">Business-minded log jo paise, markets aur companies ki duniya mein apna naam banana chahte hain.</div>
+          <div class="stream-tags">
+            <span class="stag">CA/MBA</span>
+            <span class="stag">Banking</span>
+            <span class="stag">Finance</span>
+            <span class="stag">Startup</span>
+          </div>
+        </div>
+        <div class="stream-card art" onclick="navigate('explore');setExploreStream('art')">
+          <div class="stream-emoji">🎨</div>
+          <div class="stream-name">Arts & Humanities</div>
+          <div class="stream-tagline">Creative aur expressive log jo art, culture, law, media ya psychology mein apna passion banate hain.</div>
+          <div class="stream-tags">
+            <span class="stag">Design</span>
+            <span class="stag">Law</span>
+            <span class="stag">Media</span>
+            <span class="stag">Psychology</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="cta-section">
+    <div class="cta-box">
+      <div style="font-size:48px;margin-bottom:16px">🧭</div>
+      <div class="cta-title">Abhi shuru karo!</div>
+      <div class="cta-sub">Free mein register karo, quiz do aur apne future ka roadmap pao. Sirf 5 minutes lagte hain!</div>
+      <button class="btn-hero primary" style="margin:0 auto;display:block;width:auto;padding:14px 36px" onclick="navigate('register')">Free Account Banao →</button>
+    </div>
+  </section>
+
+  <footer class="footer">
+    <div class="footer-logo">CareerXplorer</div>
+    <div>Class 10th ke students ke liye — India's gamified career compass</div>
+    <div style="margin-top:12px;color:var(--dim);font-size:12px">Made with ❤️ for every student who's ever felt lost about their future</div>
+  </footer>
+</div>
+
+<!-- ═══════════════ LOGIN PAGE ═══════════════ -->
+<div class="page content-wrap" id="page-login">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">CareerXplorer</div>
+      <div class="auth-sub">Wapas aao! Apna account mein login karo 👋</div>
+      <div class="auth-error hidden" id="login-error"></div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" id="login-email" placeholder="tumhara@email.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="login-password" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/>
+      </div>
+      <button class="form-btn" onclick="doLogin()">Login →</button>
+      <div class="divider">ya</div>
+      <div class="auth-switch">Naya account chahiye? <span onclick="navigate('register')">Register karo</span></div>
+      <div class="auth-switch" style="margin-top:10px"><span onclick="navigate('landing')">← Wapas home par</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ REGISTER PAGE ═══════════════ -->
+<div class="page content-wrap" id="page-register">
+  <div class="auth-wrap">
+    <div class="auth-card">
+      <div class="auth-logo">CareerXplorer</div>
+      <div class="auth-sub">Apna career journey shuru karo — bilkul free! 🚀</div>
+      <div class="auth-error hidden" id="reg-error"></div>
+      <div class="form-group">
+        <label class="form-label">Full Name</label>
+        <input class="form-input" type="text" id="reg-name" placeholder="Tumhara poora naam"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Email Address</label>
+        <input class="form-input" type="email" id="reg-email" placeholder="tumhara@email.com"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Password</label>
+        <input class="form-input" type="password" id="reg-password" placeholder="Min. 6 characters"/>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Tum abhi kaunsi class mein ho?</label>
+        <select class="form-input" id="reg-class">
+          <option value="10">Class 10th</option>
+          <option value="11">Class 11th</option>
+          <option value="9">Class 9th</option>
+        </select>
+      </div>
+      <button class="form-btn" onclick="doRegister()">Account Banao →</button>
+      <div class="divider">ya</div>
+      <div class="auth-switch">Already account hai? <span onclick="navigate('login')">Login karo</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ DASHBOARD ═══════════════ -->
+<div class="page content-wrap" id="page-dashboard">
+  <div class="dash-layout">
+    <aside class="sidebar">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Menu</div>
+        <button class="sidebar-item active" onclick="showDashSection('overview',this)">
+          <span class="sidebar-icon">🏠</span> Overview
+        </button>
+        <button class="sidebar-item" onclick="navigate('quiz')">
+          <span class="sidebar-icon">🎮</span> Take Quiz
+        </button>
+        <button class="sidebar-item" onclick="navigate('explore')">
+          <span class="sidebar-icon">🔍</span> Explore
+        </button>
+        <button class="sidebar-item" onclick="navigate('results')">
+          <span class="sidebar-icon">📊</span> My Results
+        </button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Account</div>
+        <button class="sidebar-item" onclick="navigate('profile')">
+          <span class="sidebar-icon">👤</span> Profile
+        </button>
+        <button class="sidebar-item" onclick="logout()">
+          <span class="sidebar-icon">🚪</span> Logout
+        </button>
+      </div>
+    </aside>
+
+    <main class="dash-content">
+      <div class="dash-greeting">
+        <div class="greeting-hi">Welcome back 👋</div>
+        <div class="greeting-name" id="dash-name">Student</div>
+        <div class="greeting-sub">Aaj kuch naya explore karo!</div>
+      </div>
+
+      <div class="xp-level-card">
+        <div class="level-badge" id="dash-level">1</div>
+        <div class="xp-info">
+          <div class="xp-title" id="dash-rank">Explorer</div>
+          <div class="xp-subtitle">Next level ke liye <span id="xp-needed">500</span> XP chahiye</div>
+          <div class="xp-bar-bg"><div class="xp-bar-fill" id="dash-xp-fill" style="width:0%"></div></div>
+        </div>
+        <div class="xp-count" id="dash-xp-count">0 XP</div>
+      </div>
+
+      <div id="dash-stream-result" class="hidden stream-result-banner">
+        <div class="sr-icon" id="dsr-icon">📈</div>
+        <div>
+          <div class="sr-stream" id="dsr-stream">Commerce</div>
+          <div class="sr-sub">Tumhara recommended stream</div>
+        </div>
+        <div class="sr-score">
+          <div class="sr-score-val" id="dsr-score">—</div>
+          <div class="sr-score-lbl">Match %</div>
+        </div>
+      </div>
+
+      <div id="dash-no-quiz" class="dash-panel" style="margin-bottom:28px;text-align:center;padding:36px">
+        <div style="font-size:40px;margin-bottom:12px">🎮</div>
+        <div style="font-size:17px;font-weight:700;margin-bottom:8px">Quiz abhi nahi diya</div>
+        <div style="font-size:14px;color:var(--muted);margin-bottom:20px">Apna career quiz do aur apna stream jaano!</div>
+        <button class="btn-hero primary" style="display:inline-block;padding:12px 28px" onclick="navigate('quiz')">Quiz Start Karo →</button>
+      </div>
+
+      <div class="stats-grid">
+        <div class="stat-box">
+          <div class="stat-box-val" id="stat-xp" style="color:var(--gold)">0</div>
+          <div class="stat-box-lbl">Total XP Earned</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-val" id="stat-quiz" style="color:var(--blue)">0</div>
+          <div class="stat-box-lbl">Quizzes Completed</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-val" id="stat-streak" style="color:var(--purple)">0</div>
+          <div class="stat-box-lbl">Best Combo</div>
+        </div>
+        <div class="stat-box">
+          <div class="stat-box-val" id="stat-acc" style="color:var(--green)">0%</div>
+          <div class="stat-box-lbl">Quiz Accuracy</div>
+        </div>
+      </div>
+
+      <div class="quick-actions">
+        <div class="qa-card" onclick="navigate('quiz')">
+          <div class="qa-icon">🎮</div>
+          <div class="qa-title">Take Quiz</div>
+          <div class="qa-sub">Apna stream discover karo</div>
+        </div>
+        <div class="qa-card" onclick="navigate('explore')">
+          <div class="qa-icon">🔍</div>
+          <div class="qa-title">Explore Streams</div>
+          <div class="qa-sub">Colleges aur careers dekho</div>
+        </div>
+        <div class="qa-card" onclick="navigate('results')">
+          <div class="qa-icon">📊</div>
+          <div class="qa-title">My Results</div>
+          <div class="qa-sub">Detailed analysis dekho</div>
+        </div>
+        <div class="qa-card" onclick="navigate('profile')">
+          <div class="qa-icon">👤</div>
+          <div class="qa-title">My Profile</div>
+          <div class="qa-sub">Badges aur achievements</div>
+        </div>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- ═══════════════ QUIZ PAGE ═══════════════ -->
+<div class="page content-wrap" id="page-quiz">
+  <div class="quiz-wrap">
+    <div class="quiz-container">
+      <div id="quiz-start-screen">
+        <div style="text-align:center;padding:20px 0">
+          <div style="font-size:72px;margin-bottom:16px;animation:float 3s ease-in-out infinite">🧭</div>
+          <div style="font-family:'Baloo 2',cursive;font-size:32px;font-weight:800;margin-bottom:12px">Career Quiz</div>
+          <div style="font-size:16px;color:var(--muted);max-width:420px;margin:0 auto 32px;line-height:1.7">10 sawalon mein pata lagao tumhara dil kaunsi stream ke liye dhadkta hai — Science, Commerce ya Arts!</div>
+          <div style="display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:36px">
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;text-align:center;min-width:100px">
+              <div style="font-family:'Baloo 2',cursive;font-size:24px;font-weight:800;color:var(--gold)">10</div>
+              <div style="font-size:12px;color:var(--muted)">Questions</div>
+            </div>
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;text-align:center;min-width:100px">
+              <div style="font-family:'Baloo 2',cursive;font-size:24px;font-weight:800;color:var(--blue)">XP</div>
+              <div style="font-size:12px;color:var(--muted)">Points</div>
+            </div>
+            <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;text-align:center;min-width:100px">
+              <div style="font-family:'Baloo 2',cursive;font-size:24px;font-weight:800;color:var(--purple)">🔥</div>
+              <div style="font-size:12px;color:var(--muted)">Combos</div>
+            </div>
+          </div>
+          <button class="btn-hero primary" onclick="startQuiz()" style="padding:15px 40px;font-size:18px">🎮 Start Karo!</button>
+        </div>
+      </div>
+
+      <div id="quiz-play-screen" class="hidden">
+        <div class="quiz-header">
+          <div class="quiz-prog-label">
+            <span id="q-num">Question 1 of 10</span>
+            <span id="q-cat-label">Category</span>
+          </div>
+          <div class="prog-track"><div class="prog-fill" id="quiz-prog" style="width:0%"></div></div>
+          <div class="quiz-meta">
+            <div class="xp-chip">⚡ <span id="quiz-xp">0</span> XP</div>
+            <div class="combo-chip">🔥 <span id="quiz-combo">0</span>x Combo</div>
+          </div>
+        </div>
+        <div id="combo-popup" class="combo-popup hidden"></div>
+        <div class="q-card">
+          <div class="q-cat" id="q-category"></div>
+          <div class="q-text" id="q-question"></div>
+        </div>
+        <div class="options-list" id="quiz-options"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ RESULTS PAGE ═══════════════ -->
+<div class="page content-wrap" id="page-results">
+  <div class="results-wrap">
+    <div class="results-container">
+      <div class="result-hero">
+        <div class="result-badge" id="res-badge">📈</div>
+        <div class="result-stream-title" id="res-title">Commerce Stream</div>
+        <div class="result-tagline" id="res-tagline">Tumhara analysis yahan hai!</div>
+        <div class="score-chips">
+          <div class="score-chip"><div class="sc-val" id="res-xp-val" style="color:var(--gold)">—</div><div class="sc-lbl">Total XP</div></div>
+          <div class="score-chip"><div class="sc-val" id="res-acc-val" style="color:var(--blue)">—</div><div class="sc-lbl">Accuracy</div></div>
+          <div class="score-chip"><div class="sc-val" id="res-rank-val" style="color:var(--purple)">—</div><div class="sc-lbl">Your Rank</div></div>
+        </div>
+      </div>
+
+      <div class="results-grid">
+        <div class="result-panel">
+          <div class="rp-title">STREAM MATCH SCORE</div>
+          <div id="res-bars"></div>
+        </div>
+        <div class="result-panel">
+          <div class="rp-title">CAREER OPPORTUNITIES 🎯</div>
+          <div class="opp-grid" id="res-opps"></div>
+        </div>
+      </div>
+
+      <div class="result-cta-row">
+        <button class="btn-hero primary" onclick="navigate('explore')">🔍 Aur Detail Dekho</button>
+        <button class="btn-hero secondary" onclick="navigate('quiz')">🔄 Dobara Khelo</button>
+        <button class="btn-hero secondary" onclick="navigate('dashboard')">📊 Dashboard</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ EXPLORE PAGE ═══════════════ -->
+<div class="page content-wrap" id="page-explore">
+  <div class="explore-wrap">
+    <div class="explore-header">
+      <div class="explore-title">🔍 Explore Everything</div>
+      <div class="explore-sub">Streams, colleges, careers aur subjects — sab kuch yahan explore karo</div>
+    </div>
+
+    <div class="stream-filter">
+      <button class="sf-btn active" onclick="filterStream('all',this)">All Streams</button>
+      <button class="sf-btn" onclick="filterStream('sci',this)">🔬 Science</button>
+      <button class="sf-btn" onclick="filterStream('com',this)">📈 Commerce</button>
+      <button class="sf-btn" onclick="filterStream('art',this)">🎨 Arts</button>
+    </div>
+
+    <div class="tab-bar">
+      <button class="tab-btn active" onclick="showTab('careers',this)">💼 Career Paths</button>
+      <button class="tab-btn" onclick="showTab('colleges',this)">🏛 Top Colleges</button>
+      <button class="tab-btn" onclick="showTab('subjects',this)">📚 Subjects Guide</button>
+    </div>
+
+    <div class="tab-panel active" id="tab-careers">
+      <div class="career-grid" id="career-grid"></div>
+    </div>
+
+    <div class="tab-panel" id="tab-colleges">
+      <div class="college-grid" id="college-grid"></div>
+    </div>
+
+    <div class="tab-panel" id="tab-subjects">
+      <div id="subjects-content"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ PROFILE PAGE ═══════════════ -->
+<div class="page content-wrap" id="page-profile">
+  <div class="profile-wrap">
+    <div class="profile-card">
+      <div class="profile-avatar" id="prof-avatar">S</div>
+      <div class="profile-name" id="prof-name">Student</div>
+      <div class="profile-email" id="prof-email">student@email.com</div>
+      <div class="profile-badges" id="prof-badges"></div>
+    </div>
+
+    <div class="dash-panel" style="margin-bottom:20px">
+      <div class="panel-title">📊 Stats Overview</div>
+      <div class="stats-grid" style="margin-bottom:0">
+        <div class="stat-box"><div class="stat-box-val" id="prof-xp" style="color:var(--gold)">0</div><div class="stat-box-lbl">Total XP</div></div>
+        <div class="stat-box"><div class="stat-box-val" id="prof-quiz" style="color:var(--blue)">0</div><div class="stat-box-lbl">Quizzes Done</div></div>
+        <div class="stat-box"><div class="stat-box-val" id="prof-stream" style="color:var(--gold)">—</div><div class="stat-box-lbl">Top Stream</div></div>
+        <div class="stat-box"><div class="stat-box-val" id="prof-level" style="color:var(--purple)">1</div><div class="stat-box-lbl">Level</div></div>
+      </div>
+    </div>
+
+    <div class="dash-panel">
+      <div class="panel-title">🏆 Achievements</div>
+      <div id="achievements-grid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ════════════════════════════════════════
+// DATA
+// ════════════════════════════════════════
+const QUIZ_QUESTIONS = [
+  { cat:"Logical Thinking", text:"Math ke kisi problem ko solve karne mein tumhe kaisa lagta hai?",
+    opts:[{ico:"😍",text:"Bahut maza aata hai, puzzles mujhe pasand hain",s:{sci:3,com:1,art:0}},{ico:"🤔",text:"Thoda mushkil lagta hai, par try karta/ti hoon",s:{sci:1,com:2,art:0}},{ico:"😐",text:"Boring lagta hai, creative cheezein zyada pasand hain",s:{sci:0,com:0,art:3}},{ico:"💰",text:"Sirf tabhi pasand jab paise se related ho",s:{sci:0,com:3,art:0}}]},
+  { cat:"Creative Thinking", text:"Free time mein tum kya karna pasand karte ho?",
+    opts:[{ico:"🎭",text:"Drawing, music, dance ya drama",s:{sci:0,com:0,art:3}},{ico:"🔬",text:"Experiments karna ya naye cheezein discover karna",s:{sci:3,com:0,art:0}},{ico:"📈",text:"Games ya trading mein strategy banana",s:{sci:0,com:3,art:0}},{ico:"📚",text:"History ya stories padhna",s:{sci:0,com:1,art:2}}]},
+  { cat:"Future Vision", text:"10 saal baad tum apne aap ko kahan dekhte ho?",
+    opts:[{ico:"👨‍💻",text:"Doctor, Engineer ya Scientist",s:{sci:3,com:0,art:0}},{ico:"👔",text:"Business owner ya finance expert",s:{sci:0,com:3,art:0}},{ico:"🎬",text:"Designer, filmmaker ya artist",s:{sci:0,com:0,art:3}},{ico:"⚖️",text:"Lawyer, IAS officer ya journalist",s:{sci:0,com:1,art:2}}]},
+  { cat:"Favorite Subjects", text:"School mein kaun sa subject tumhara favorite hai?",
+    opts:[{ico:"⚗️",text:"Science (Physics, Chemistry, Biology)",s:{sci:3,com:0,art:0}},{ico:"📊",text:"Maths aur Economics",s:{sci:1,com:3,art:0}},{ico:"🖼️",text:"Art, Music ya Drama",s:{sci:0,com:0,art:3}},{ico:"🌍",text:"History, Geography ya Languages",s:{sci:0,com:1,art:2}}]},
+  { cat:"Problem Solving", text:"Koi bada problem aane par tum kya karte ho?",
+    opts:[{ico:"📐",text:"Data collect, analyze, logical solution nikalo",s:{sci:3,com:1,art:0}},{ico:"💡",text:"Creative tarike se sochta/ti hoon",s:{sci:0,com:0,art:3}},{ico:"🤝",text:"Team ke saath milke practical solution",s:{sci:0,com:3,art:1}},{ico:"📝",text:"Write karo ya discuss karo",s:{sci:0,com:1,art:2}}]},
+  { cat:"What Excites You", text:"Tumhare liye zyada exciting kya hai?",
+    opts:[{ico:"🧬",text:"Jeevan ke secrets — cells, DNA, planets",s:{sci:3,com:0,art:0}},{ico:"📉",text:"Market, profit-loss, investments",s:{sci:0,com:3,art:0}},{ico:"🎵",text:"Art, music aur self-expression",s:{sci:0,com:0,art:3}},{ico:"🗣️",text:"Log aur unki kahaniyaan",s:{sci:0,com:1,art:2}}]},
+  { cat:"Tech & Gadgets", text:"Technology ke baare mein tumhara nazar kaisa hai?",
+    opts:[{ico:"🤖",text:"AI, robots — bahut fascinating lagta hai!",s:{sci:3,com:1,art:0}},{ico:"📱",text:"Digital marketing aur e-commerce mein interest",s:{sci:0,com:3,art:0}},{ico:"🎮",text:"Game design aur animation!",s:{sci:0,com:0,art:3}},{ico:"😊",text:"Theek hai, jitni zaroorat utna use",s:{sci:0,com:1,art:1}}]},
+  { cat:"How People Know You", text:"Log tumhe kaise jaante hain?",
+    opts:[{ico:"🔍",text:"Curious aur analytical — hamesha 'why' poochha karte ho",s:{sci:3,com:0,art:0}},{ico:"💸",text:"Practical aur smart — business sense",s:{sci:0,com:3,art:0}},{ico:"🌈",text:"Creative aur expressive — ideas se bharpoor",s:{sci:0,com:0,art:3}},{ico:"💬",text:"Communicator — baaton se dil jeet lete ho",s:{sci:0,com:1,art:2}}]},
+  { cat:"Work Style", text:"Kaise kaam karna tumhe zyada comfortable lagta hai?",
+    opts:[{ico:"🏗️",text:"Lab ya field mein practical kaam",s:{sci:3,com:0,art:1}},{ico:"🏢",text:"Office mein strategies aur planning",s:{sci:0,com:3,art:0}},{ico:"🎨",text:"Studio ya creative space mein kaam",s:{sci:0,com:0,art:3}},{ico:"📜",text:"Research aur writing",s:{sci:1,com:1,art:2}}]},
+  { cat:"Biggest Dream", text:"Sabse bada sapna kya hai?",
+    opts:[{ico:"🚀",text:"Space ya medical research mein discover karna",s:{sci:3,com:0,art:0}},{ico:"🏦",text:"Bada business ya startup banana",s:{sci:0,com:3,art:0}},{ico:"🏆",text:"Award-winning artist ya designer banna",s:{sci:0,com:0,art:3}},{ico:"🌏",text:"Society change karna — politics, law ya media",s:{sci:0,com:1,art:2}}]}
+];
+
+const STREAM_DATA = {
+  sci:{name:"Science Stream",emoji:"🔬",color:"#4f8ef7",tagline:"Tumhara analytical aur curious mind Science ke liye bana hai!",
+    opps:["Engineering (IIT/NIT)","MBBS/Medical","Data Science","Research/PhD","Space/ISRO","Pharmacy"],rank:"Scientist"},
+  com:{name:"Commerce Stream",emoji:"📈",color:"#f7c948",tagline:"Business aur finance tumhari duniya hai — lakho opportunities hain!",
+    opps:["CA/CMA/CS","MBA/BBA","Banking & Finance","Entrepreneur","Stock Market","E-Commerce"],rank:"Strategist"},
+  art:{name:"Arts & Humanities",emoji:"🎨",color:"#a78bfa",tagline:"Creative aur expressive talent tumhara superpower hai!",
+    opps:["Fashion Design","Journalism","Law (LLB)","Psychology","UX Design","Civil Services"],rank:"Creator"}
+};
+
+const CAREERS = [
+  {stream:"sci",icon:"👨‍💻",title:"Software Engineer",salary:"₹8–40L",desc:"Apps, websites aur software banao. India ki fastest growing field.",steps:["B.Tech CS","Internships","TCS/Infosys/Startups"]},
+  {stream:"sci",icon:"🏥",title:"MBBS Doctor",salary:"₹10–50L",desc:"Logo ki jaan bachao. Noble aur respected profession.",steps:["PCB in 12th","NEET Exam","MBBS 5.5 years"]},
+  {stream:"sci",icon:"🚀",title:"Data Scientist",salary:"₹10–35L",desc:"Data se insights nikalo, AI models banao. Bahut demand hai.",steps:["B.Tech/B.Sc","Python/ML Skills","Top Companies"]},
+  {stream:"sci",icon:"🔬",title:"Research Scientist",salary:"₹6–25L",desc:"New discoveries karo — labs, universities ya govt institutes mein.",steps:["B.Sc/B.Tech","M.Sc/M.Tech","PhD + Research"]},
+  {stream:"com",icon:"📊",title:"Chartered Accountant",salary:"₹7–30L",desc:"India ka most respected finance profession. High demand always.",steps:["12th Commerce","CA Foundation","CA Final"]},
+  {stream:"com",icon:"🏢",title:"MBA Graduate",salary:"₹8–50L",desc:"Management, marketing, finance — CEO tak ka rasta.",steps:["BBA/B.Com","CAT/GMAT","IIM/Top MBA"]},
+  {stream:"com",icon:"🏦",title:"Investment Banker",salary:"₹12–60L",desc:"Companies ko fund raise karne mein help karo. High paying!",steps:["B.Com/BBA","MBA Finance","Goldman/JPMorgan"]},
+  {stream:"com",icon:"🚀",title:"Entrepreneur",salary:"Unlimited 🔥",desc:"Apna khud ka business banao. Risk high, reward bhi high!",steps:["Any Degree","Skills Build","Launch Startup"]},
+  {stream:"art",icon:"🎨",title:"UX/UI Designer",salary:"₹6–25L",desc:"Apps aur websites ko beautiful aur usable banao.",steps:["Design Degree","Portfolio Build","Tech Companies"]},
+  {stream:"art",icon:"⚖️",title:"Advocate/Lawyer",salary:"₹5–50L",desc:"Insaaf ke liye lado. Corporate ya criminal law mein career.",steps:["12th Any Stream","LLB 5 years","Practice/Firm"]},
+  {stream:"art",icon:"📺",title:"Journalist",salary:"₹4–20L",desc:"News report karo, stories khojo. Print, digital ya TV mein.",steps:["BA Journalism","Internships","Media House"]},
+  {stream:"art",icon:"🧠",title:"Psychologist",salary:"₹5–20L",desc:"Logo ki mental health mein help karo. Growing field in India.",steps:["BA Psychology","MA/M.Sc","Clinical Practice"]}
+];
+
+const COLLEGES = [
+  {stream:"sci",rank:1,name:"IIT Bombay",city:"Mumbai, Maharashtra",tags:["B.Tech","M.Tech","JEE Advanced"],color:"#4f8ef7"},
+  {stream:"sci",rank:2,name:"IIT Delhi",city:"New Delhi",tags:["B.Tech","Research","JEE Advanced"],color:"#4f8ef7"},
+  {stream:"sci",rank:3,name:"AIIMS Delhi",city:"New Delhi",tags:["MBBS","Medical","NEET"],color:"#4f8ef7"},
+  {stream:"sci",rank:4,name:"NIT Trichy",city:"Tamil Nadu",tags:["B.Tech","JEE Mains","Affordable"],color:"#4f8ef7"},
+  {stream:"com",rank:1,name:"SRCC Delhi",city:"Delhi University",tags:["B.Com(H)","Economics","Cut-off 99%+"],color:"#f7c948"},
+  {stream:"com",rank:2,name:"Narsee Monjee",city:"Mumbai",tags:["BMS","BAF","Finance"],color:"#f7c948"},
+  {stream:"com",rank:3,name:"Christ University",city:"Bangalore",tags:["BBA","B.Com","MBA"],color:"#f7c948"},
+  {stream:"com",rank:4,name:"Symbiosis Pune",city:"Pune",tags:["BBA","Economics","Management"],color:"#f7c948"},
+  {stream:"art",rank:1,name:"LSR College",city:"Delhi University",tags:["Psychology","English","Sociology"],color:"#a78bfa"},
+  {stream:"art",rank:2,name:"Jamia Millia Islamia",city:"New Delhi",tags:["Journalism","Law","Design"],color:"#a78bfa"},
+  {stream:"art",rank:3,name:"NID Ahmedabad",city:"Gujarat",tags:["Design","B.Des","Top Design School"],color:"#a78bfa"},
+  {stream:"art",rank:4,name:"NLSIU Bangalore",city:"Karnataka",tags:["Law","LLB","CLAT"],color:"#a78bfa"}
+];
+
+// ════════════════════════════════════════
+// AUTH SYSTEM (localStorage)
+// ════════════════════════════════════════
+function getUsers() { try { return JSON.parse(localStorage.getItem('cx_users') || '{}'); } catch(e) { return {}; } }
+function saveUsers(u) { localStorage.setItem('cx_users', JSON.stringify(u)); }
+function getCurrentUser() { try { return JSON.parse(localStorage.getItem('cx_current') || 'null'); } catch(e) { return null; } }
+function setCurrentUser(u) { localStorage.setItem('cx_current', JSON.stringify(u)); }
+function clearCurrentUser() { localStorage.removeItem('cx_current'); }
+
+function updateUserData(key, val) {
+  const u = getCurrentUser();
+  if (!u) return;
+  const users = getUsers();
+  if (!users[u.email]) return;
+  users[u.email][key] = val;
+  saveUsers(users);
+  setCurrentUser(users[u.email]);
+}
+
+function doRegister() {
+  const name = document.getElementById('reg-name').value.trim();
+  const email = document.getElementById('reg-email').value.trim();
+  const pass = document.getElementById('reg-password').value;
+  const cls = document.getElementById('reg-class').value;
+  const errEl = document.getElementById('reg-error');
+
+  if (!name || !email || !pass) { showErr(errEl, 'Saare fields fill karo!'); return; }
+  if (pass.length < 6) { showErr(errEl, 'Password kam se kam 6 characters ka hona chahiye.'); return; }
+  if (!email.includes('@')) { showErr(errEl, 'Valid email address dalo.'); return; }
+
+  const users = getUsers();
+  if (users[email]) { showErr(errEl, 'Ye email already registered hai. Login karo!'); return; }
+
+  const newUser = { name, email, pass, cls, xp: 0, quizzes: 0, bestCombo: 0, topStream: null, streamScores: null, quizXP: 0 };
+  users[email] = newUser;
+  saveUsers(users);
+  setCurrentUser(newUser);
+
+  errEl.classList.add('hidden');
+  toast('🎉 Account ban gaya! Welcome, ' + name + '!');
+  navigate('dashboard');
+  updateNav();
+}
+
+function doLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass = document.getElementById('login-password').value;
+  const errEl = document.getElementById('login-error');
+
+  if (!email || !pass) { showErr(errEl, 'Email aur password dono dalo!'); return; }
+
+  const users = getUsers();
+  if (!users[email] || users[email].pass !== pass) { showErr(errEl, 'Email ya password galat hai!'); return; }
+
+  setCurrentUser(users[email]);
+  errEl.classList.add('hidden');
+  toast('👋 Welcome back, ' + users[email].name + '!');
+  navigate('dashboard');
+  updateNav();
+}
+
+function logout() {
+  clearCurrentUser();
+  updateNav();
+  navigate('landing');
+  toast('Successfully logged out!');
+}
+
+function requireAuth(page) {
+  if (!getCurrentUser()) { navigate('login'); return; }
+  navigate(page);
+}
+
+function showErr(el, msg) { el.textContent = msg; el.classList.remove('hidden'); }
+
+// ════════════════════════════════════════
+// NAVIGATION
+// ════════════════════════════════════════
+function navigate(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page-' + page).classList.add('active');
+  window.scrollTo(0, 0);
+  if (page === 'dashboard') loadDashboard();
+  if (page === 'profile') loadProfile();
+  if (page === 'results') loadResults();
+  if (page === 'explore') loadExplore();
+  if (page === 'quiz') loadQuizPage();
+}
+
+function updateNav() {
+  const user = getCurrentUser();
+  document.getElementById('nav-auth-btns').classList.toggle('hidden', !!user);
+  document.getElementById('nav-user-btns').classList.toggle('hidden', !user);
+}
+
+// ════════════════════════════════════════
+// DASHBOARD
+// ════════════════════════════════════════
+function loadDashboard() {
+  const u = getCurrentUser();
+  if (!u) { navigate('login'); return; }
+
+  document.getElementById('dash-name').textContent = u.name + ' 👋';
+  const level = Math.floor(u.xp / 500) + 1;
+  const xpInLevel = u.xp % 500;
+  document.getElementById('dash-level').textContent = level;
+  document.getElementById('dash-rank').textContent = getRank(u.xp);
+  document.getElementById('xp-needed').textContent = 500 - xpInLevel;
+  document.getElementById('dash-xp-fill').style.width = (xpInLevel / 500 * 100) + '%';
+  document.getElementById('dash-xp-count').textContent = u.xp + ' XP';
+  document.getElementById('stat-xp').textContent = u.xp;
+  document.getElementById('stat-quiz').textContent = u.quizzes || 0;
+  document.getElementById('stat-streak').textContent = u.bestCombo || 0;
+  document.getElementById('stat-acc').textContent = u.quizzes ? '100%' : '0%';
+
+  if (u.topStream) {
+    document.getElementById('dash-no-quiz').classList.add('hidden');
+    document.getElementById('dash-stream-result').classList.remove('hidden');
+    const sd = STREAM_DATA[u.topStream];
+    document.getElementById('dsr-icon').textContent = sd.emoji;
+    document.getElementById('dsr-stream').textContent = sd.name;
+    document.getElementById('dsr-score').textContent = u.streamScores ? Math.round(u.streamScores[u.topStream] / (u.streamScores.sci + u.streamScores.com + u.streamScores.art) * 100) + '%' : '—';
+  } else {
+    document.getElementById('dash-no-quiz').classList.remove('hidden');
+    document.getElementById('dash-stream-result').classList.add('hidden');
+  }
+}
+
+function getRank(xp) {
+  if (xp >= 5000) return '🌟 Legend';
+  if (xp >= 2000) return '💎 Master';
+  if (xp >= 1000) return '⚡ Expert';
+  if (xp >= 500) return '🔥 Achiever';
+  return '🚀 Explorer';
+}
+
+// ════════════════════════════════════════
+// QUIZ
+// ════════════════════════════════════════
+let qState = { current: 0, xp: 0, combo: 0, scores: {sci:0,com:0,art:0} };
+
+function loadQuizPage() {
+  document.getElementById('quiz-start-screen').classList.remove('hidden');
+  document.getElementById('quiz-play-screen').classList.add('hidden');
+  qState = { current: 0, xp: 0, combo: 0, scores: {sci:0,com:0,art:0} };
+}
+
+function startQuiz() {
+  qState = { current: 0, xp: 0, combo: 0, scores: {sci:0,com:0,art:0} };
+  document.getElementById('quiz-start-screen').classList.add('hidden');
+  document.getElementById('quiz-play-screen').classList.remove('hidden');
+  renderQuestion();
+}
+
+function renderQuestion() {
+  const q = QUIZ_QUESTIONS[qState.current];
+  const pct = (qState.current / QUIZ_QUESTIONS.length * 100);
+  document.getElementById('quiz-prog').style.width = pct + '%';
+  document.getElementById('q-num').textContent = 'Question ' + (qState.current + 1) + ' of ' + QUIZ_QUESTIONS.length;
+  document.getElementById('q-cat-label').textContent = q.cat;
+  document.getElementById('q-category').textContent = '🎯 ' + q.cat.toUpperCase();
+  document.getElementById('q-question').textContent = q.text;
+  document.getElementById('quiz-xp').textContent = qState.xp;
+  document.getElementById('quiz-combo').textContent = qState.combo;
+  document.getElementById('combo-popup').classList.add('hidden');
+
+  const grid = document.getElementById('quiz-options');
+  grid.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.innerHTML = '<span class="opt-ico">' + opt.ico + '</span><span>' + opt.text + '</span>';
+    btn.onclick = () => selectOption(opt, btn);
+    grid.appendChild(btn);
+  });
+}
+
+function selectOption(opt, btn) {
+  document.querySelectorAll('.opt-btn').forEach(b => b.disabled = true);
+  btn.classList.add('selected');
+
+  qState.combo++;
+  const bonus = qState.combo > 2 ? 50 : 0;
+  qState.xp += 100 + bonus;
+  qState.scores.sci += opt.s.sci;
+  qState.scores.com += opt.s.com;
+  qState.scores.art += opt.s.art;
+
+  document.getElementById('quiz-xp').textContent = qState.xp;
+  document.getElementById('quiz-combo').textContent = qState.combo;
+
+  if (qState.combo > 1) {
+    const cp = document.getElementById('combo-popup');
+    cp.textContent = '🔥 ' + qState.combo + 'x Combo! +' + (100 + bonus) + ' XP!';
+    cp.classList.remove('hidden');
+  }
+
+  spawnXP(100 + bonus);
+
+  setTimeout(() => {
+    qState.current++;
+    if (qState.current >= QUIZ_QUESTIONS.length) finishQuiz();
+    else renderQuestion();
+  }, 750);
+}
+
+function spawnXP(amt) {
+  const el = document.createElement('div');
+  el.className = 'xp-float';
+  el.textContent = '+' + amt + ' XP!';
+  el.style.left = (30 + Math.random() * 40) + '%';
+  el.style.top = '40%';
+  document.body.appendChild(el);
+  setTimeout(() => el.remove(), 1100);
+}
+
+function finishQuiz() {
+  const sc = qState.scores;
+  const top = Object.keys(sc).sort((a,b) => sc[b] - sc[a])[0];
+
+  const u = getCurrentUser();
+  if (u) {
+    const users = getUsers();
+    users[u.email].xp = (users[u.email].xp || 0) + qState.xp;
+    users[u.email].quizzes = (users[u.email].quizzes || 0) + 1;
+    users[u.email].bestCombo = Math.max(users[u.email].bestCombo || 0, qState.combo);
+    users[u.email].topStream = top;
+    users[u.email].streamScores = sc;
+    users[u.email].quizXP = qState.xp;
+    saveUsers(users);
+    setCurrentUser(users[u.email]);
+  }
+
+  navigate('results');
+}
+
+// ════════════════════════════════════════
+// RESULTS
+// ════════════════════════════════════════
+function loadResults() {
+  const u = getCurrentUser();
+  if (!u || !u.topStream) {
+    document.getElementById('res-title').textContent = 'Quiz nahi diya abhi!';
+    document.getElementById('res-tagline').textContent = 'Pehle quiz do phir results dekho.';
+    return;
+  }
+
+  const top = u.topStream;
+  const sd = STREAM_DATA[top];
+  const sc = u.streamScores || {sci:0,com:0,art:0};
+  const total = sc.sci + sc.com + sc.art || 1;
+
+  document.getElementById('res-badge').textContent = sd.emoji;
+  document.getElementById('res-title').textContent = sd.name;
+  document.getElementById('res-title').style.color = sd.color;
+  document.getElementById('res-tagline').textContent = sd.tagline;
+  document.getElementById('res-xp-val').textContent = u.quizXP || u.xp;
+  document.getElementById('res-acc-val').textContent = '100%';
+  document.getElementById('res-rank-val').textContent = sd.rank;
+
+  const colors = {sci:'#4f8ef7', com:'#f7c948', art:'#a78bfa'};
+  const names = {sci:'🔬 Science', com:'📈 Commerce', art:'🎨 Arts'};
+  document.getElementById('res-bars').innerHTML = Object.keys(sc).map(k => {
+    const pct = Math.round(sc[k] / total * 100);
+    return `<div class="stream-score-row">
+      <div class="ssr-name">${names[k]}</div>
+      <div class="ssr-bar"><div class="ssr-fill" style="width:${pct}%;background:${colors[k]}"></div></div>
+      <div class="ssr-pct" style="color:${colors[k]}">${pct}%</div>
+    </div>`;
+  }).join('');
+
+  document.getElementById('res-opps').innerHTML = sd.opps.map(o =>
+    `<div class="opp-pill"><div class="opp-dot" style="background:${sd.color}"></div>${o}</div>`
+  ).join('');
+}
+
+// ════════════════════════════════════════
+// EXPLORE
+// ════════════════════════════════════════
+let activeFilter = 'all';
+
+function loadExplore() {
+  renderCareers(); renderColleges(); renderSubjects();
+}
+
+function filterStream(f, btn) {
+  activeFilter = f;
+  document.querySelectorAll('.sf-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderCareers(); renderColleges();
+}
+
+function setExploreStream(s) {
+  activeFilter = s;
+  document.querySelectorAll('.sf-btn').forEach(b => {
+    b.classList.toggle('active', b.textContent.toLowerCase().includes(s) || (s==='all' && b.textContent==='All Streams'));
+  });
+  loadExplore();
+}
+
+function showTab(tab, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-' + tab).classList.add('active');
+  btn.classList.add('active');
+}
+
+function renderCareers() {
+  const data = activeFilter === 'all' ? CAREERS : CAREERS.filter(c => c.stream === activeFilter);
+  document.getElementById('career-grid').innerHTML = data.map((c, i) => `
+    <div class="career-card" onclick="openCareerModal(${i})" style="cursor:pointer">
+      <div class="cc-header">
+        <div class="cc-icon">${c.icon}</div>
+        <div class="cc-title">${c.title}</div>
+        <div class="cc-salary">${c.salary}</div>
+      </div>
+      <div class="cc-desc">${c.desc}</div>
+      <div class="cc-steps">${c.steps.map(s => `<div class="cc-step">${s}</div>`).join('<div style="color:var(--dim);font-size:11px;padding:3px 2px">→</div>')}</div>
+      <div style="margin-top:12px;font-size:12px;color:var(--gold);font-weight:600">Click for details →</div>
+    </div>
+  `).join('');
+}
+
+function renderColleges() {
+  const data = activeFilter === 'all' ? COLLEGES : COLLEGES.filter(c => c.stream === activeFilter);
+  document.getElementById('college-grid').innerHTML = data.map((c, i) => `
+    <div class="college-crd" onclick="openCollegeModal(${i})" style="cursor:pointer">
+      <div class="coll-rank" style="background:${c.color}22;color:${c.color}">#${c.rank}</div>
+      <div class="coll-name">${c.name}</div>
+      <div class="coll-city">📍 ${c.city}</div>
+      <div class="coll-tags">${c.tags.map(t => `<span class="coll-tag">${t}</span>`).join('')}</div>
+      <div style="margin-top:10px;font-size:12px;color:var(--gold);font-weight:600">Click for details →</div>
+    </div>
+  `).join('');
+}
+
+const CAREER_DETAILS = [
+  {icon:"👨‍💻",title:"Software Engineer",salary:"₹8–40L",stream:"sci",desc:"Apps, websites aur software banao. India ki fastest growing field hai. Startups se lekar Google tak har jagah demand hai.",skills:["Python/Java/C++","Problem Solving","Data Structures","Git & Version Control"],exams:["JEE Main/Advanced","BITSAT","State CETs"],colleges:["IITs","NITs","BITS Pilani","VIT"],scope:"Bahut high — India mein 10 lakh+ software jobs har saal!"},
+  {icon:"🏥",title:"MBBS Doctor",salary:"₹10–50L",stream:"sci",desc:"Logo ki sehat bachao. India mein doctor hona ek bahut respected profession hai. Specialist banne ke baad earning bahut zyada hoti hai.",skills:["Biology (Must)","Chemistry","Patience","Communication"],exams:["NEET UG","AIIMS (ab NEET mein)"],colleges:["AIIMS Delhi","JIPMER","BHU","Govt Medical Colleges"],scope:"Always high demand — India mein doctor-patient ratio bahut kam hai"},
+  {icon:"🚀",title:"Data Scientist",salary:"₹10–35L",stream:"sci",desc:"Data se patterns nikalo, AI models banao, business decisions help karo. Naya aur exciting field!",skills:["Python","Statistics","Machine Learning","SQL"],exams:["JEE/GATE","B.Sc Statistics"],colleges:["IITs","IISc","ISI Kolkata","BITS"],scope:"Exploding demand — 2025 mein India mein 1 lakh+ data science jobs"},
+  {icon:"🔬",title:"Research Scientist",salary:"₹6–25L",stream:"sci",desc:"New discoveries karo — physics, chemistry, biology, space science mein. ISRO, DRDO, CSIR mein kaam karo.",skills:["Deep Subject Knowledge","Analytical Thinking","Writing","Patience"],exams:["JEE/NEET","JEST","CSIR NET"],colleges:["IISc Bangalore","IITs","TIFR","IISER"],scope:"Stable govt jobs + international opportunities"},
+  {icon:"📊",title:"Chartered Accountant",salary:"₹7–30L",stream:"com",desc:"India ka most prestigious finance certification. Companies ki accounts, tax, audit — sab CA karta hai. High demand hamesha!",skills:["Accountancy","Taxation","Law","Maths"],exams:["CA Foundation","CA Intermediate","CA Final"],colleges:["ICAI (No college needed)","B.Com kaafi hai"],scope:"50,000+ vacancies har saal. Big 4 firms mein ₹20L+ package"},
+  {icon:"🏢",title:"MBA Graduate",salary:"₹8–50L",stream:"com",desc:"Management, marketing, finance, HR — MBA ke baad leadership roles milti hain. IIM se MBA karne ke baad salary bahut high hoti hai.",skills:["Leadership","Communication","Analytics","Networking"],exams:["CAT","XAT","GMAT (foreign)"],colleges:["IIM Ahmedabad/Bangalore/Calcutta","XLRI","FMS Delhi"],scope:"Top IIMs se average package ₹25-35L per annum"},
+  {icon:"🏦",title:"Investment Banker",salary:"₹12–60L",stream:"com",desc:"Companies ko fund raise karne mein help karo, mergers-acquisitions handle karo. High stress, high reward!",skills:["Finance","Excel/Modelling","Networking","Hustle"],exams:["CAT/GMAT","CFA (optional)"],colleges:["IIMs","ISB Hyderabad","NMIMS"],scope:"Goldman Sachs, JP Morgan, Morgan Stanley hire karte hain India se"},
+  {icon:"🚀",title:"Entrepreneur",salary:"Unlimited",stream:"com",desc:"Apna khud ka business banao. E-commerce, SaaS, D2C brand — kuch bhi! Risk high hai lekin reward bhi unlimited!",skills:["Resilience","Sales","Marketing","Finance Basics"],exams:["Koi exam nahi!"],colleges:["IITs/IIMs helpful","Par zaruri nahi"],scope:"India mein startup ecosystem bahut bada ho gaya — 100+ unicorns hain!"},
+  {icon:"🎨",title:"UX/UI Designer",salary:"₹6–25L",stream:"art",desc:"Apps aur websites ko beautiful aur easy-to-use banao. Tech companies mein designers ki bahut demand hai.",skills:["Figma/Adobe XD","User Research","Visual Design","Prototyping"],exams:["NID (Design)","UCEED","State Design Exams"],colleges:["NID Ahmedabad","IDC IIT Bombay","NIFT"],scope:"Every tech product ko designer chahiye — very high demand"},
+  {icon:"⚖️",title:"Advocate/Lawyer",salary:"₹5–50L",stream:"art",desc:"Insaaf ke liye lado. Corporate law mein ₹50L+ bhi possible hai. Criminal, civil, corporate — kai options hain.",skills:["Reading & Research","Argumentation","Writing","Patience"],exams:["CLAT","AILET","LSAT India"],colleges:["NLSIU Bangalore","NLU Delhi","Symbiosis Law"],scope:"Corporate lawyers ki bahut demand hai — LLB ke baad MBA bhi karo"},
+  {icon:"📺",title:"Journalist",salary:"₹4–20L",stream:"art",desc:"News report karo, stories khojo, truth samaj ke saamne rakho. Print, digital, TV — kai platforms hain.",skills:["Writing","Communication","Research","Curiosity"],exams:["IIMC Entrance","Journalism Entrances"],colleges:["IIMC Delhi","Jamia Millia","Symbiosis"],scope:"Digital journalism bahut bada ho raha hai — YouTube journalists bhi ₹20L+ kamate hain"},
+  {icon:"🧠",title:"Psychologist",salary:"₹5–20L",stream:"art",desc:"Logo ki mental health mein help karo. Clinical, school, corporate — teen alag career paths hain. India mein bahut growing field!",skills:["Empathy","Communication","Research","Counselling"],exams:["BA/BSc Psychology","RCI Registration"],colleges:["NIMHANS Bangalore","Delhi University","Christ University"],scope:"India mein mental health awareness badh rahi hai — demand growing!"}
+];
+
+const COLLEGE_DETAILS = [
+  {rank:1,name:"IIT Bombay",city:"Mumbai",stream:"sci",color:"#4f8ef7",desc:"India ka #1 engineering college. World class research facilities, amazing placements. Dream college for most science students.",courses:["B.Tech (8 branches)","M.Tech","PhD","Dual Degree"],cutoff:"JEE Advanced Top 100 rank",fees:"₹2.5L/year (hostel included)",placement:"Avg ₹20L, highest ₹2Cr+",website:"iitb.ac.in"},
+  {rank:2,name:"IIT Delhi",city:"New Delhi",stream:"sci",color:"#4f8ef7",desc:"Delhi mein best engineering college. Government, industry aur research — teeno mein top alumni hain.",courses:["B.Tech","M.Tech","MBA (DMS)","PhD"],cutoff:"JEE Advanced Top 200 rank",fees:"₹2.5L/year",placement:"Avg ₹18L, highest ₹1.5Cr+",website:"iitd.ac.in"},
+  {rank:3,name:"AIIMS Delhi",city:"New Delhi",stream:"sci",color:"#4f8ef7",desc:"India ka best medical college. Yahan admission lena ek bada achievement hai. World class facilities.",courses:["MBBS","MD/MS","BSc Nursing","PhD"],cutoff:"NEET Top 50 rank (General)",fees:"₹6,000/year (almost free!)",placement:"Govt jobs + private hospitals ₹15L+",website:"aiims.edu"},
+  {rank:4,name:"NIT Trichy",city:"Tamil Nadu",stream:"sci",color:"#4f8ef7",desc:"Best NIT in India. IIT nahi mila toh NIT Trichy best option hai. Placements bahut acchi hain.",courses:["B.Tech (10 branches)","M.Tech","MBA","PhD"],cutoff:"JEE Mains Top 5000 rank",fees:"₹1.5L/year",placement:"Avg ₹8L, highest ₹80L",website:"nitt.edu"},
+  {rank:1,name:"SRCC Delhi",city:"Delhi University",stream:"com",color:"#f7c948",desc:"India ka #1 commerce college. SRCC se B.Com karna ek prestige hai. Top MBA colleges mein sidha entry milti hai.",courses:["B.Com (Hons)","Economics (Hons)"],cutoff:"99%+ in 12th",fees:"₹15,000/year (DU rates)",placement:"Internships at Big 4, Banks, Consulting",website:"srcc.du.ac.in"},
+  {rank:2,name:"Narsee Monjee",city:"Mumbai",stream:"com",color:"#f7c948",desc:"Mumbai ka top commerce college. BMS, BAF, BBI — industry-specific courses hain jo placements mein bahut help karte hain.",courses:["BMS","BAF","BBI","B.Com"],cutoff:"92-95% in 12th",fees:"₹80,000/year",placement:"Good placements in BFSI sector",website:"nmcollege.in"},
+  {rank:3,name:"Christ University",city:"Bangalore",stream:"com",color:"#f7c948",desc:"South India ka top choice for BBA/B.Com. Modern curriculum, good industry connections. Bangalore mein hone ka fayda.",courses:["BBA","B.Com","BA Economics","MBA"],cutoff:"85-90% + entrance test",fees:"₹1.5L/year",placement:"KPMG, Deloitte, startups mein",website:"christuniversity.in"},
+  {rank:4,name:"Symbiosis Pune",city:"Pune",stream:"com",color:"#f7c948",desc:"Private college mein top choice. Diverse student body, good infrastructure. Pune ka peaceful environment.",courses:["BBA","B.Com","Economics","MBA"],cutoff:"SET entrance exam",fees:"₹2L/year",placement:"Average ₹5-8L package",website:"symbiosiscollege.edu.in"},
+  {rank:1,name:"LSR College",city:"Delhi University",stream:"art",color:"#a78bfa",desc:"Arts ke liye Delhi ka best women's college. Psychology, History, English — sabhi top departments hain.",courses:["BA Psychology","BA English","BA History","BA Economics"],cutoff:"97-99% in 12th",fees:"₹12,000/year",placement:"Civil Services, Media, Research",website:"lsr.edu.in"},
+  {rank:2,name:"Jamia Millia Islamia",city:"New Delhi",stream:"art",color:"#a78bfa",desc:"IIMC ke saath Jamia journalism ke liye best. Law Faculty bhi bahut strong hai. Central university hone ka fayda.",courses:["BA Journalism","LLB","BA History","Fine Arts"],cutoff:"Entrance exam based",fees:"₹20,000/year",placement:"Media houses, Law firms",website:"jmi.ac.in"},
+  {rank:3,name:"NID Ahmedabad",city:"Gujarat",stream:"art",color:"#a78bfa",desc:"India ka #1 design college. NID se degree matlab top companies mein direct entry. Creativity ki koi limit nahi yahan.",courses:["B.Des (8 specializations)","M.Des","PhD"],cutoff:"NID entrance exam",fees:"₹2L/year",placement:"Apple, Google, Indian brands hire karte hain",website:"nid.edu"},
+  {rank:4,name:"NLSIU Bangalore",city:"Karnataka",stream:"art",color:"#a78bfa",desc:"India ka #1 law college. CLAT crack karo aur 5 saal baad top law firm mein ₹15L+ package pao.",courses:["BA LLB (5 year)","LLM","PhD Law"],cutoff:"CLAT Top 100 rank",fees:"₹2.5L/year",placement:"Top law firms, Corporate, Judiciary",website:"nls.ac.in"}
+];
+
+function openCareerModal(globalIdx) {
+  const filteredData = activeFilter === 'all' ? CAREERS : CAREERS.filter(c => c.stream === activeFilter);
+  const career = filteredData[globalIdx];
+  const careerKey = CAREERS.findIndex(c => c.title === career.title);
+  const detail = CAREER_DETAILS[careerKey] || CAREER_DETAILS[0];
+  showModal(`
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+      <div style="font-size:48px">${detail.icon}</div>
+      <div>
+        <div style="font-family:'Baloo 2',cursive;font-size:24px;font-weight:800">${detail.title}</div>
+        <div style="background:rgba(52,211,153,0.15);color:#34d399;padding:4px 12px;border-radius:50px;font-size:13px;font-weight:700;display:inline-block;margin-top:4px">${detail.salary} per year</div>
+      </div>
+    </div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:20px">${detail.desc}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:16px">
+      <div style="background:var(--surface);border-radius:var(--radius);padding:14px">
+        <div style="font-size:12px;color:var(--gold);font-weight:700;margin-bottom:10px;letter-spacing:1px">REQUIRED SKILLS</div>
+        ${detail.skills.map(s => `<div style="font-size:13px;color:var(--muted);padding:5px 0;border-bottom:1px solid var(--border)">${s}</div>`).join('')}
+      </div>
+      <div style="background:var(--surface);border-radius:var(--radius);padding:14px">
+        <div style="font-size:12px;color:var(--blue);font-weight:700;margin-bottom:10px;letter-spacing:1px">ENTRANCE EXAMS</div>
+        ${detail.exams.map(e => `<div style="font-size:13px;color:var(--muted);padding:5px 0;border-bottom:1px solid var(--border)">${e}</div>`).join('')}
+      </div>
+    </div>
+    <div style="background:var(--surface);border-radius:var(--radius);padding:14px;margin-bottom:14px">
+      <div style="font-size:12px;color:var(--purple);font-weight:700;margin-bottom:8px;letter-spacing:1px">SCOPE & FUTURE</div>
+      <div style="font-size:14px;color:var(--muted)">${detail.scope}</div>
+    </div>
+    <div style="font-size:12px;color:var(--gold);font-weight:700;margin-bottom:8px;letter-spacing:1px">TOP COLLEGES</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      ${detail.colleges.map(c => `<span style="background:rgba(247,201,72,0.1);border:1px solid rgba(247,201,72,0.2);color:var(--gold);padding:4px 12px;border-radius:50px;font-size:12px;font-weight:600">${c}</span>`).join('')}
+    </div>
+  `, detail.title);
+}
+
+function openCollegeModal(globalIdx) {
+  const filteredData = activeFilter === 'all' ? COLLEGES : COLLEGES.filter(c => c.stream === activeFilter);
+  const college = filteredData[globalIdx];
+  const collegeKey = COLLEGES.findIndex(c => c.name === college.name);
+  const detail = COLLEGE_DETAILS[collegeKey] || COLLEGE_DETAILS[0];
+  showModal(`
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:20px">
+      <div style="width:56px;height:56px;border-radius:50%;background:${detail.color}22;display:flex;align-items:center;justify-content:center;font-family:'Baloo 2',cursive;font-size:20px;font-weight:800;color:${detail.color}">#${detail.rank}</div>
+      <div>
+        <div style="font-family:'Baloo 2',cursive;font-size:22px;font-weight:800">${detail.name}</div>
+        <div style="font-size:13px;color:var(--muted)">📍 ${detail.city}</div>
+      </div>
+    </div>
+    <div style="font-size:14px;color:var(--muted);line-height:1.7;margin-bottom:20px">${detail.desc}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+      <div style="background:var(--surface);border-radius:var(--radius);padding:14px">
+        <div style="font-size:11px;color:var(--gold);font-weight:700;letter-spacing:1px;margin-bottom:6px">CUT-OFF</div>
+        <div style="font-size:13px;color:var(--text)">${detail.cutoff}</div>
+      </div>
+      <div style="background:var(--surface);border-radius:var(--radius);padding:14px">
+        <div style="font-size:11px;color:var(--green);font-weight:700;letter-spacing:1px;margin-bottom:6px">FEES</div>
+        <div style="font-size:13px;color:var(--text)">${detail.fees}</div>
+      </div>
+      <div style="background:var(--surface);border-radius:var(--radius);padding:14px">
+        <div style="font-size:11px;color:var(--blue);font-weight:700;letter-spacing:1px;margin-bottom:6px">PLACEMENT</div>
+        <div style="font-size:13px;color:var(--text)">${detail.placement}</div>
+      </div>
+      <div style="background:var(--surface);border-radius:var(--radius);padding:14px">
+        <div style="font-size:11px;color:var(--purple);font-weight:700;letter-spacing:1px;margin-bottom:6px">WEBSITE</div>
+        <div style="font-size:13px;color:var(--blue)">${detail.website}</div>
+      </div>
+    </div>
+    <div style="font-size:12px;color:var(--gold);font-weight:700;margin-bottom:10px;letter-spacing:1px">COURSES OFFERED</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px">
+      ${detail.courses.map(c => `<span style="background:rgba(247,201,72,0.1);border:1px solid rgba(247,201,72,0.2);color:var(--gold);padding:4px 12px;border-radius:50px;font-size:12px;font-weight:600">${c}</span>`).join('')}
+    </div>
+  `, detail.name);
+}
+
+function showModal(contentHTML, title) {
+  const existing = document.getElementById('cx-modal');
+  if (existing) existing.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'cx-modal';
+  modal.style.cssText = `position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(0,0,0,0.75);`;
+  modal.innerHTML = `
+    <div style="background:var(--card);border:1px solid var(--border2);border-radius:var(--radius-lg);width:100%;max-width:560px;max-height:85vh;overflow-y:auto;padding:28px;position:relative">
+      <button onclick="document.getElementById('cx-modal').remove()" style="position:absolute;top:16px;right:16px;background:rgba(255,255,255,0.08);border:none;color:var(--muted);width:32px;height:32px;border-radius:50%;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center">✕</button>
+      ${contentHTML}
+    </div>`;
+  modal.onclick = (e) => { if(e.target === modal) modal.remove(); };
+  document.body.appendChild(modal);
+}
+
+function showDashSection(sec, btn) {
+  document.querySelectorAll('.sidebar-item').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function renderSubjects() {
+  const subjectsHTML = `
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:20px">
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px">
+        <div style="font-size:28px;margin-bottom:12px">🔬</div>
+        <div style="font-family:'Baloo 2',cursive;font-size:18px;font-weight:700;color:#4f8ef7;margin-bottom:16px">Science Subjects</div>
+        ${['Physics — Forces, energy, mechanics','Chemistry — Elements, reactions, bonds','Biology — Life, cells, evolution','Mathematics — Calculus, algebra','Computer Science — Programming basics'].map(s => `<div style="padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--muted)">${s}</div>`).join('')}
+        <div style="margin-top:16px;padding:12px;background:rgba(79,142,247,0.08);border-radius:var(--radius-sm);font-size:13px;color:#4f8ef7">💡 PCM ya PCB — dono valid hai goals ke anusaar!</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px">
+        <div style="font-size:28px;margin-bottom:12px">📈</div>
+        <div style="font-family:'Baloo 2',cursive;font-size:18px;font-weight:700;color:#f7c948;margin-bottom:16px">Commerce Subjects</div>
+        ${['Accountancy — Balance sheets, ledgers','Business Studies — Management basics','Economics — Markets, GDP, demand-supply','Mathematics (Optional) — CA ke liye important','Computer Science (Optional) — Digital business'].map(s => `<div style="padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--muted)">${s}</div>`).join('')}
+        <div style="margin-top:16px;padding:12px;background:rgba(247,201,72,0.08);border-radius:var(--radius-sm);font-size:13px;color:#f7c948">💡 CA ya MBA ke liye Maths lena better hai!</div>
+      </div>
+      <div style="background:var(--card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:24px">
+        <div style="font-size:28px;margin-bottom:12px">🎨</div>
+        <div style="font-family:'Baloo 2',cursive;font-size:18px;font-weight:700;color:#a78bfa;margin-bottom:16px">Arts Subjects</div>
+        ${['History — Ancient to modern India','Political Science — Government, democracy','Geography — Physical, human geography','Psychology — Mind aur behaviour','Sociology — Society aur culture','Fine Arts / Music / Drama'].map(s => `<div style="padding:10px 0;border-bottom:1px solid var(--border);font-size:14px;color:var(--muted)">${s}</div>`).join('')}
+        <div style="margin-top:16px;padding:12px;background:rgba(167,139,250,0.08);border-radius:var(--radius-sm);font-size:13px;color:#a78bfa">💡 UPSC ke liye Arts stream bahut helpful hai!</div>
+      </div>
+    </div>`;
+  document.getElementById('subjects-content').innerHTML = subjectsHTML;
+}
+
+// ════════════════════════════════════════
+// PROFILE
+// ════════════════════════════════════════
+function loadProfile() {
+  const u = getCurrentUser();
+  if (!u) { navigate('login'); return; }
+
+  const initials = u.name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0,2);
+  document.getElementById('prof-avatar').textContent = initials;
+  document.getElementById('prof-name').textContent = u.name;
+  document.getElementById('prof-email').textContent = u.email;
+  document.getElementById('prof-xp').textContent = u.xp || 0;
+  document.getElementById('prof-quiz').textContent = u.quizzes || 0;
+  document.getElementById('prof-stream').textContent = u.topStream ? STREAM_DATA[u.topStream].emoji + ' ' + u.topStream.toUpperCase() : '—';
+  document.getElementById('prof-level').textContent = Math.floor((u.xp || 0) / 500) + 1;
+
+  const badges = [];
+  if ((u.quizzes || 0) >= 1) badges.push('🎮 Quiz Taker');
+  if ((u.xp || 0) >= 500) badges.push('⚡ XP Hunter');
+  if ((u.xp || 0) >= 1000) badges.push('🔥 Power User');
+  if (u.topStream === 'sci') badges.push('🔬 Science Star');
+  if (u.topStream === 'com') badges.push('📈 Commerce King');
+  if (u.topStream === 'art') badges.push('🎨 Creative Soul');
+  if (!badges.length) badges.push('🚀 New Explorer');
+
+  document.getElementById('prof-badges').innerHTML = badges.map(b =>
+    `<span class="pb">${b}</span>`).join('');
+
+  const achievements = [
+    { icon: '🎮', title: 'Quiz Master', desc: 'Pehla quiz complete kiya', earned: (u.quizzes || 0) >= 1 },
+    { icon: '⚡', title: '500 XP Club', desc: '500 XP earn kiya', earned: (u.xp || 0) >= 500 },
+    { icon: '🔥', title: '1000 XP Hero', desc: '1000 XP earn kiya', earned: (u.xp || 0) >= 1000 },
+    { icon: '🔥', title: 'Combo King', desc: '5+ combo streak', earned: (u.bestCombo || 0) >= 5 },
+    { icon: '🎯', title: 'Stream Found', desc: 'Apna stream discover kiya', earned: !!u.topStream },
+    { icon: '🌟', title: 'Legend', desc: '5000 XP earn karo', earned: (u.xp || 0) >= 5000 },
+  ];
+
+  document.getElementById('achievements-grid').innerHTML = achievements.map(a => `
+    <div style="background:${a.earned ? 'rgba(247,201,72,0.08)' : 'var(--surface)'};border:1px solid ${a.earned ? 'rgba(247,201,72,0.25)' : 'var(--border)'};border-radius:var(--radius);padding:16px;opacity:${a.earned ? 1 : 0.45}">
+      <div style="font-size:28px;margin-bottom:8px">${a.icon}</div>
+      <div style="font-size:14px;font-weight:700;margin-bottom:4px;color:${a.earned ? 'var(--gold)' : 'var(--muted)'}">${a.title}</div>
+      <div style="font-size:12px;color:var(--muted)">${a.desc}</div>
+    </div>
+  `).join('');
+}
+
+// ════════════════════════════════════════
+// TOAST
+// ════════════════════════════════════════
+function toast(msg) {
+  const el = document.createElement('div');
+  el.className = 'toast';
+  el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(() => el.style.opacity = '0', 2500);
+  setTimeout(() => el.remove(), 3000);
+}
+
+// ════════════════════════════════════════
+// INIT
+// ════════════════════════════════════════
+updateNav();
+loadExplore();
+
+// Float animation for quiz start
+const style = document.createElement('style');
+style.textContent = `@keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }`;
+document.head.appendChild(style);
+</script>
+</body>
+</html>
